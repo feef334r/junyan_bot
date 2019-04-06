@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "dotenv": "^7.0.0",
+    "socks5-https-client": "^1.2.1",
+    "telegraf": "^3.28.0"
+  },
+  "devDependencies": {
+    "debug": "^4.1.1"
+  }
+}
