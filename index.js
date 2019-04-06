@@ -69,12 +69,12 @@ const triggers = new Map([
         })
     };
 
-    bot.start((ctx) => ctx.reply('我是*俊*语bot，开源地址： [GitHub](https://github.com/feef334r/junyan)', markdown));
+    bot.start((ctx) => ctx.reply('我是*俊*语bot，开源地址： [GitHub](https://github.com/feef334r/junyan_bot)', markdown));
     bot.command('waimai', junHandler);
     bot.command('waimai@junyan_bot', junHandler);
     bot.command('diss', dissHandler);
     bot.command('diss@junyan_bot', dissHandler);
-    
+
     // Easter EGG
     for (const [trigger, word, p = 0.7] of triggers) {
         bot.hears(trigger, ctx => {
