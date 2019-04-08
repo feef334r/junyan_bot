@@ -65,7 +65,7 @@ const triggers = new Map([
         let { stickers } = await getStickerSet(ctx);
 
         ctx.telegram.sendSticker(ctx.message.chat.id, stickers[Math.floor(Math.random() * stickers.length)].file_id, {
-            reply_to_message_id: ctx.message.message_id
+            reply_to_message_id: ctx.message.reply_to_message ? ctx.message.reply_to_message.message_id : ctx.message.message_id
         })
     };
 
@@ -88,4 +88,6 @@ const triggers = new Map([
     }
 
     bot.launch();
+
+    console.log('Bot Running');
 })();
