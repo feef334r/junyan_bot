@@ -35,11 +35,13 @@ const random = jun => {
     return story; // TODO
 };
 
+const sleep = ms => new Promise( resolve => setTimeout(resolve, ms));
+
 const triggers = new Map([
     // regex or regex array (OR), words, probability?
     [/大新闻/g, '所有人一律不得接受媒体采访！', 0.4],
-    [/工人/g, '不要突出资本主义那些矛盾', 0.1],
-    [/怎么又(是|来)/g, '若是发现学生意见很大或发表言论，请收集信息截屏私发给我们', 0.35],
+    [/工人/g, '不要突出资本主义那些矛盾！', 0.1],
+    [/怎么又(是|来)/g, '若是发现学生意见很大或发表言论，请收集信息截屏私发给我们。', 0.35],
     [/举报/g, '统一上报领导处理！', 0.6]
 ]);
 
@@ -65,7 +67,7 @@ const triggers = new Map([
         let { stickers } = await getStickerSet(ctx);
 
         ctx.telegram.sendSticker(ctx.message.chat.id, stickers[Math.floor(Math.random() * stickers.length)].file_id, {
-            reply_to_message_id: ctx.message.reply_to_message ? ctx.message.reply_to_message.message_id : ctx.message.message_id
+            // reply_to_message_id: ctx.message.reply_to_message ? ctx.message.reply_to_message.message_id : ctx.message.message_id
         })
     };
 
@@ -77,9 +79,10 @@ const triggers = new Map([
 
     // Easter EGG
     for (const [trigger, word, p = 0.7] of triggers) {
-        bot.hears(trigger, ctx => {
+        bot.hears(trigger, async ctx => {
             const r = Math.random();
             if (r <= p) {
+                await sleep(Math.round(1200 + Math.random() * 300));
                 ctx.telegram.sendMessage(ctx.message.chat.id, word, {
                     reply_to_message_id: ctx.message.message_id
                 })
