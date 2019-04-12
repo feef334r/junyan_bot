@@ -5,6 +5,8 @@ const fs = require('fs'),
 
 require('dotenv').config();
 
+process.on('uncaughtException', e => console.error(e));
+
 let bot;
 
 {
@@ -19,7 +21,6 @@ let bot;
 
     bot = new Telegraf(process.env.BOT_TOKEN, {
         telegram: agent ? { agent } : void 0,
-        username: 'junyan_bot'
     });
 }
 
@@ -67,15 +68,48 @@ const triggers = new Map([
         let { stickers } = await getStickerSet(ctx);
 
         ctx.telegram.sendSticker(ctx.message.chat.id, stickers[Math.floor(Math.random() * stickers.length)].file_id, {
-            // reply_to_message_id: ctx.message.reply_to_message ? ctx.message.reply_to_message.message_id : ctx.message.message_id
+            reply_to_message_id: ctx.message.reply_to_message ? ctx.message.reply_to_message.message_id : void 0 // 借刀杀人
         })
     };
 
-    bot.start((ctx) => ctx.reply('我是*俊*言*俊*语bot，欢迎来为语录库添砖加瓦。开源地址： [GitHub](https://github.com/feef334r/junyan_bot)', markdown));
+    bot.start((ctx) => ctx.reply('我是*俊*言*俊*语bot，欢迎来为语录库添砖加瓦。\n开源地址： [GitHub](https://github.com/feef334r/junyan_bot)', markdown));
     bot.command('waimai', junHandler);
     bot.command('waimai@junyan_bot', junHandler);
     bot.command('diss', dissHandler);
     bot.command('diss@junyan_bot', dissHandler);
+    bot.on('inline_query', async ctx => {
+        // 俊言检索
+        const queryStr = ctx.update.inline_query.query;
+        const queries = (queryStr || '').split(' ').filter( s => s.length > 0); // AND
+        if (!queries.length) {
+            return ctx.answerInlineQuery([], { cache_time: 0 });
+        }
+
+        let ret = [];
+        w: for (const [i, words] of Object.entries(jun)) {
+            for (const query of queries) {
+                if (words.indexOf(query) === -1) {
+                    continue w;
+                }
+            }
+
+            // push
+            const index = words.indexOf(queries[0]),
+                u = index + queries.length + 8,
+                l = Math.max(0, index - 8);
+            ret.push({
+                type: 'article',
+                id: i.toString(),
+                title: ( l > 0 ? '...' : '') + words.slice( l, u ) + (u >= words.length ? '' : '...'),
+                input_message_content: {
+                    message_text: words.replace(new RegExp('('+queries.join('|')+')', 'mg'), '<b>$1</b>'),
+                    parse_mode: 'HTML'
+                }
+            })
+        }
+
+        ctx.answerInlineQuery(ret, { cache_time: 10 });
+    });
 
     // Easter EGG
     for (const [trigger, word, p = 0.7] of triggers) {
@@ -89,6 +123,10 @@ const triggers = new Map([
             }
         });
     }
+
+    const { username } = await bot.telegram.getMe();
+    console.log('Bot initialized with username:', username);
+    bot.options.username = username;
 
     bot.launch();
 
