@@ -67,6 +67,8 @@ const triggers = new Map([
     const dissHandler = async ctx => {
         let { stickers } = await getStickerSet(ctx);
 
+        console.log(ctx.message.reply_to_message);
+
         ctx.telegram.sendSticker(ctx.message.chat.id, stickers[Math.floor(Math.random() * stickers.length)].file_id, {
             reply_to_message_id: ctx.message.reply_to_message ? ctx.message.reply_to_message.message_id : void 0 // 借刀杀人
         })
