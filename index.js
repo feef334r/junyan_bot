@@ -118,7 +118,7 @@ const triggers = new Map([
             if (r <= p) {
                 await sleep(Math.round(1200 + Math.random() * 300));
                 ctx.telegram.sendMessage(ctx.message.chat.id, word, {
-                    reply_to_message_id: ctx.message.message_id
+                    reply_to_message_id: ctx.message.reply_to_message ? ctx.message.reply_to_message.message_id : ctx.message.message_id
                 })
             }
         });
